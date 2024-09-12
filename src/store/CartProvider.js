@@ -34,7 +34,29 @@ const CartProvider=(props)=>{
           setTotalAmount((prevTotalAmount)=>prevTotalAmount+item.price*item.quantity);
     };
 
-    const removeItemFromCartHandler=(id)=>{};
+    const removeItemFromCartHandler=(id)=>{
+        const existingItemIndex = items.findIndex(
+            (cartItem) => cartItem.id === id
+          );
+          const existingItem = items[existingItemIndex];
+      
+          if (existingItem) {
+            const updatedItems = [...items];
+            if (existingItem.quantity === 1) {
+              // Remove the item if quantity is 1
+              updatedItems.splice(existingItemIndex, 1);
+            } else {
+              // Decrease the quantity
+              const updatedItem = { ...existingItem, quantity: existingItem.quantity - 1 };
+              updatedItems[existingItemIndex] = updatedItem;
+            }
+            
+            updateItems(updatedItems);
+      
+            // Update total amount (subtract price of the removed item)
+            setTotalAmount((prevTotalAmount) => prevTotalAmount - existingItem.price);
+          }    
+    };
 
     const cartContext={
         items:items,
