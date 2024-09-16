@@ -1,65 +1,95 @@
-import React,{useState} from "react";
+import React,{useState,useReducer} from "react";
 import CartContext from "./cart-context";
 
+const defaultCartState={
+  items:[]
+};
+
+const cartReducer = (state, action) => {
+  if (action.type === 'ADD') {
+    const updatedItems = [...state.items];
+    const existingCartItemIndex = updatedItems.findIndex(
+      (item) => item.id === action.item.id
+    );
+    const existingCartItem = updatedItems[existingCartItemIndex];
+
+    if (existingCartItem) {
+      // Update the quantity
+      const updatedItem = {
+        ...existingCartItem,
+        quantity: Number(existingCartItem.quantity) +Number(action.item.quantity),
+      };
+      updatedItems[existingCartItemIndex] = updatedItem;
+    } else {
+      // Add the new item
+      updatedItems.push({ ...action.item});
+    }
+
+    return {
+      ...state,
+      items: updatedItems, 
+    };
+  }
+
+  if (action.type === 'REMOVE') {
+    const updatedItems = [...state.items];
+    const existingCartItemIndex = updatedItems.findIndex(
+      (item) => item.id === action.id
+    );
+    const existingCartItem = updatedItems[existingCartItemIndex];
+
+    if (existingCartItem) {
+      if (existingCartItem.quantity === 1) {
+        // Remove the item if quantity is 1
+        updatedItems.splice(existingCartItemIndex, 1);
+      } else {
+        // Decrease the quantity
+        const updatedItem = {
+          ...existingCartItem,
+          quantity: existingCartItem.quantity - 1,
+        };
+        updatedItems[existingCartItemIndex] = updatedItem;
+      }
+    }
+
+    return {
+      ...state,
+      items: updatedItems, 
+    };
+  }
+
+  return state;
+};
+
 const CartProvider=(props)=>{
-    const [items,updateItems]=useState([]);
+
+    const[cartState,dispatchCartAction]=useReducer(cartReducer,defaultCartState);
+   
     const[totalAmount,setTotalAmount]=useState(0);
 
 
     const addItemToCartHandler=(item)=>{
-        const existingItemIndex = items.findIndex(
-            (cartItem) => cartItem.id === item.id
-          );
-          const existingItem = items[existingItemIndex];
+        dispatchCartAction({type:"ADD",item:item});
+      
           
-      
-          let updatedItems;
-      
-          if (existingItem) {
-            // Create a new object with the updated quantity instead of mutating existingItem
-            const updatedItem = {
-              ...existingItem,
-              quantity: Number(existingItem.quantity) + Number(item.quantity),
-            };
-      
-            // Update the array with the new object
-            updatedItems = [...items];
-            updatedItems[existingItemIndex] = updatedItem;
-          } else {
-            // If the item is not found, add it to the array
-            updatedItems = [item, ...items];
-          }
-      
-          updateItems(updatedItems);
           setTotalAmount((prevTotalAmount)=>prevTotalAmount+item.price*item.quantity);
     };
 
     const removeItemFromCartHandler=(id)=>{
-        const existingItemIndex = items.findIndex(
-            (cartItem) => cartItem.id === id
-          );
-          const existingItem = items[existingItemIndex];
+      const existingItem = cartState.items.find((item) => item.id === id);
+  
       
-          if (existingItem) {
-            const updatedItems = [...items];
-            if (existingItem.quantity === 1) {
-              // Remove the item if quantity is 1
-              updatedItems.splice(existingItemIndex, 1);
-            } else {
-              // Decrease the quantity
-              const updatedItem = { ...existingItem, quantity: existingItem.quantity - 1 };
-              updatedItems[existingItemIndex] = updatedItem;
-            }
-            
-            updateItems(updatedItems);
-      
-            // Update total amount (subtract price of the removed item)
-            setTotalAmount((prevTotalAmount) => prevTotalAmount - existingItem.price);
-          }    
-    };
+      if (existingItem) {
+        dispatchCartAction({ type: "REMOVE", id: id });
+        
+       
+        setTotalAmount((prevTotalAmount) => prevTotalAmount - existingItem.price);
+    }
+  }    
+    
 
     const cartContext={
-        items:items,
+        items:cartState.items,
         totalAmount:totalAmount,
         addItem:addItemToCartHandler,
         removeItem:removeItemFromCartHandler
@@ -69,6 +99,6 @@ const CartProvider=(props)=>{
         <CartContext.Provider value={cartContext}>{props.children}</CartContext.Provider>
     )
 
-}
+  };
 
 export default CartProvider;

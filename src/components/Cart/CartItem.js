@@ -1,10 +1,10 @@
 import classes from './CartItem.module.css';
 import CartContext from '../../store/cart-context';
-import { useContext } from 'react';
+import { useContext} from 'react';
 
 const CartItem = (props) => {
     const cartCtx=useContext(CartContext);
-
+    
     const onAdd=()=>{
         cartCtx.addItem({
             id:props.id,
@@ -12,10 +12,12 @@ const CartItem = (props) => {
             price:props.price,
             quantity:1,
         })
+        
     }
 
     const onRemove=()=>{
         cartCtx.removeItem(props.id);
+      
     }
   
 

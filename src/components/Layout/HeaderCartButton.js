@@ -8,9 +8,14 @@ const HeaderCartButton=(props)=>{
 
     const contextCtx=useContext(CartContext);
     let quantity=0;
-    contextCtx.items.forEach((item)=>{
-        quantity=quantity+Number(item.quantity);
-    })
+    if (Array.isArray(contextCtx.items)) {
+        contextCtx.items.forEach((item) => {
+          quantity = quantity + Number(item.quantity);
+        });
+      } else {
+        console.log('contextCtx.items is not an array', contextCtx.items);
+      }
+    console.log(quantity);
     return <button className={classes.button} onClick={props.onClick}>
         <span className={classes.icon}>
             <CartIcon/>

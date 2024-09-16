@@ -2,11 +2,11 @@ import React from "react";
 import classes from "./MealItemForm.module.css";
 import Input from "../../UI/Input";
 import CartContext from "../../../store/cart-context";
-import {  useContext } from "react";
+import {  useContext} from "react";
 
 const MealItemForm=(props)=>{
-    
     const cartCtx=useContext(CartContext);
+    
     
     const addItemHandler=(event)=>{
         event.preventDefault();
@@ -17,6 +17,7 @@ const MealItemForm=(props)=>{
     
         
         cartCtx.addItem({...props.item,quantity:quantity});
+        
         
        
         
@@ -34,6 +35,7 @@ const MealItemForm=(props)=>{
             max:"5",
             step:"1",
             defaultValue:"1"
+           
             
            
            

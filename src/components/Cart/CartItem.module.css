@@ -5,7 +5,8 @@
     border-bottom: 2px solid #8a2b06;
     padding: 1rem 0;
     margin: 1rem 0;
-    height: 80px;
+    height: 50px;
+    font-size: medium;
   }
   
   .cart-item h2 {
